@@ -3,832 +3,775 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Causal Detective: Pearl's Path Game</title>
+    <title>Entertainment Science Presentation</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Courier New', monospace;
+            font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
-            overflow-x: hidden;
+            color: #333;
+            overflow: hidden;
         }
-        
-        .game-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .title {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-        
-        @keyframes glow {
-            from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.2); }
-            to { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 30px rgba(255,255,255,0.4); }
-        }
-        
-        .stats {
+
+        .slide-container.active {
             display: flex;
-            justify-content: space-around;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
         }
-        
-        .stat {
+
+        .slide {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 60px;
+            max-width: 90vw;
+            max-height: 90vh;
             text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #ffeb3b;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-        
-        .game-area {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 20px;
-        }
-        
-        .diagram-container {
-            background: rgba(255,255,255,0.95);
-            border-radius: 15px;
-            padding: 20px;
-            min-height: 500px;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        
-        .controls {
-            background: rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+            overflow-y: auto;
         }
-        
-        svg {
-            width: 100%;
-            height: 100%;
-            min-height: 460px;
+
+        .slide-container.active .slide {
+            opacity: 1;
+            transform: translateY(0);
         }
-        
-        .node {
-            cursor: pointer;
-            transition: all 0.3s ease;
+
+        h1 {
+            font-size: 3rem;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-weight: 700;
+            line-height: 1.2;
         }
-        
-        .node circle {
-            fill: #2196F3;
-            stroke: #1976D2;
-            stroke-width: 2;
+
+        h2 {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 25px;
+            font-weight: 600;
         }
-        
-        .node.treatment circle {
-            fill: #4CAF50;
-            stroke: #388E3C;
-        }
-        
-        .node.outcome circle {
-            fill: #FF5722;
-            stroke: #D84315;
-        }
-        
-        .node.selected circle {
-            fill: #FFD700;
-            stroke: #FFA000;
-            stroke-width: 4;
-            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
-        }
-        
-        .node.blocked circle {
-            fill: #9C27B0;
-            stroke: #7B1FA2;
-            stroke-width: 3;
-            filter: drop-shadow(0 0 8px rgba(156, 39, 176, 0.6));
-        }
-        
-        .node:hover circle {
-            stroke-width: 3;
-            filter: drop-shadow(0 0 8px rgba(0,0,0,0.4));
-        }
-        
-        .node text {
-            font-size: 14px;
-            font-weight: bold;
-            text-anchor: middle;
-            dominant-baseline: central;
-            fill: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
-        }
-        
-        .edge {
-            stroke: #333;
-            stroke-width: 2;
-            fill: none;
-            marker-end: url(#arrowhead);
-        }
-        
-        .edge.backdoor-path {
-            stroke: #e91e63;
-            stroke-width: 3;
-            stroke-dasharray: 5,5;
-            animation: dash 1s linear infinite;
-        }
-        
-        .edge.blocked-path {
-            stroke: #9C27B0;
-            stroke-width: 3;
-            opacity: 0.6;
-        }
-        
-        @keyframes dash {
-            to { stroke-dashoffset: -10; }
-        }
-        
-        .question {
-            background: rgba(33, 150, 243, 0.1);
-            border: 2px solid #2196F3;
-            border-radius: 10px;
-            padding: 15px;
+
+        h3 {
+            font-size: 1.8rem;
+            color: #764ba2;
             margin-bottom: 20px;
+            font-weight: 500;
         }
-        
-        .question h3 {
-            color: #FFD700;
-            margin-bottom: 10px;
+
+        p {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #4a5568;
         }
-        
-        .controls button {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
+
+        ul {
+            text-align: left;
+            margin: 20px 0;
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+
+        li {
+            margin: 15px 0;
+            padding-left: 10px;
+        }
+
+        .quote {
+            font-style: italic;
+            font-size: 1.4rem;
+            color: #764ba2;
+            margin: 30px 0;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 0 10px 10px 0;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+
+        .metaphor-box {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.9);
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 15px 25px;
+            border-radius: 25px;
             cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4a5568;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
-        .btn-primary {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
             color: white;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-        }
-        
-        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
-        
-        .btn-secondary {
-            background: linear-gradient(45deg, #FF9800, #F57C00);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #4a5568;
+            z-index: 1000;
         }
-        
-        .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(45deg, #F44336, #D32F2F);
-            color: white;
-            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
-        }
-        
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
-        }
-        
-        .feedback {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .feedback.correct {
-            background: rgba(76, 175, 80, 0.2);
-            border: 2px solid #4CAF50;
-            color: #4CAF50;
-        }
-        
-        .feedback.incorrect {
-            background: rgba(244, 67, 54, 0.2);
-            border: 2px solid #F44336;
-            color: #F44336;
-        }
-        
-        .level-indicator {
-            font-size: 1.2em;
-            color: #FFD700;
-            text-align: center;
-            margin-bottom: 15px;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-        
-        .hint {
-            background: rgba(255, 235, 59, 0.1);
-            border: 1px solid #FFEB3B;
-            border-radius: 8px;
-            padding: 10px;
-            margin-top: 10px;
+
+        .url-display {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #4a5568;
+            z-index: 1000;
             font-size: 14px;
-            color: #FFEB3B;
         }
-        
-        .paths-display {
-            margin-top: 15px;
+
+        .framework-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .framework-card {
+            background: rgba(118, 75, 162, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid rgba(118, 75, 162, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .framework-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .story-section {
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .emoji {
+            font-size: 2rem;
+            margin: 0 10px;
+        }
+
+        .references-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 120px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 15px;
+            cursor: pointer;
             font-size: 12px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-            padding: 10px;
+            font-weight: 600;
+            color: #4a5568;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            display: none;
         }
-        
-        .path {
-            margin: 5px 0;
-            padding: 5px;
-            border-radius: 4px;
+
+        .references-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            transform: translateY(-1px);
         }
-        
-        .path.backdoor {
-            background: rgba(233, 30, 99, 0.2);
-            border-left: 3px solid #e91e63;
+
+        .references-btn.visible {
+            display: block;
         }
-        
-        .path.direct {
-            background: rgba(76, 175, 80, 0.2);
-            border-left: 3px solid #4CAF50;
+
+        .references-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
         }
-        
-        .path.blocked {
-            background: rgba(156, 39, 176, 0.2);
-            border-left: 3px solid #9C27B0;
-            opacity: 0.7;
+
+        .references-modal.active {
+            display: flex;
+        }
+
+        .references-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 80vw;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .references-content h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .references-content .reference {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-container.active .slide h1,
+        .slide-container.active .slide h2,
+        .slide-container.active .slide p,
+        .slide-container.active .slide ul {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .slide-container.active .slide h2 {
+            animation-delay: 0.2s;
+        }
+
+        .slide-container.active .slide p {
+            animation-delay: 0.4s;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <div class="header">
-            <h1 class="title">🕵️ Causal Detective</h1>
-            <p>Master Judea Pearl's Backdoor Criterion</p>
+    <div class="url-display">
+        https://robertjoellewis.github.io/
+    </div>
+
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">14</span>
+    </div>
+
+    <!-- Slide 1: Title -->
+    <div class="slide-container active">
+        <div class="slide">
+            <h1>Entertainment Science</h1>
+            <h2 class="highlight">Bridging the Ivory Tower & Silver Screen</h2>
+            <p style="font-size: 1.5rem; margin-top: 40px;">Why studios need social scientists and<br>why academics need a new lens on entertainment</p>
+            <div style="margin-top: 50px;">
+                <span class="emoji">🎬</span>
+                <span class="emoji">🔬</span>
+                <span class="emoji">🌉</span>
+            </div>
         </div>
-        
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-value" id="score">0</div>
-                <div>Score</div>
+    </div>
+
+    <!-- Slide 2: The Problem -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2>The Gap</h2>
+            <p>Two groups who should be shaping entertainment's future are working with outdated tools:</p>
+            <div class="framework-grid">
+                <div class="framework-card">
+                    <h3>🎭 Practitioners</h3>
+                    <p>Executives want data but lack psychological vocabulary</p>
+                    <p>Screenwriting lore ≠ audience psychology</p>
+                </div>
+                <div class="framework-card">
+                    <h3>🔬 Scientists</h3>
+                    <p>Rigorous methods but fragmented theories</p>
+                    <p>A "littered landscape" of disconnected ideas</p>
+                </div>
             </div>
-            <div class="stat">
-                <div class="stat-value" id="level">1</div>
-                <div>Level</div>
+            <p class="highlight" style="font-size: 1.4rem; margin-top: 30px;">That gap is where the most interesting possibilities live</p>
+        </div>
+    </div>
+
+    <!-- Slide 3: Mendel Metaphor -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2>The Mendel Metaphor</h2>
+            <div class="metaphor-box">
+                <h3>🌱 Gregor Mendel (1860s)</h3>
+                <p>Quietly breeding pea plants in a monastery, discovering the laws of inheritance. Rigorous, systematic, ignored for decades.</p>
+                <p><strong>Then:</strong> Three botanists rediscovered his work. Combined with new microscopy. Revolution in genetics.</p>
+                <p><strong>Result:</strong> Norman Borlaug saved over a billion lives using Mendel's "laws"</p>
             </div>
-            <div class="stat">
-                <div class="stat-value" id="streak">0</div>
-                <div>Streak</div>
+            <p class="highlight">Entertainment science today = Mendel's pea plants</p>
+            <p>Academic rigor + new understandings + data analytics + industry needs = Revolution waiting to happen</p>
+        </div>
+    </div>
+
+    <!-- Slide 4: Studio Reality -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2>Studio Executives' Questions</h2>
+            <div class="story-section">
+                <ul>
+                    <li>Who (demographically) will watch this?</li>
+                    <li>How can we get more young people to watch this?</li>
+                    <li>Is this character likable? Memorable?</li>
+                    <li>Is there enough catharsis?</li>
+                    <li>Does the cliffhanger work?</li>
+                    <li>What genre is it?</li>
+                    <li>How is the pacing?</li>
+                    <li>Will this story be successful?</li>
+                </ul>
+            </div>
+            <p><strong>The problem:</strong> These questions contain hidden psychological assumptions that require expertise in measurement, statistics, and multiple psychological frameworks</p>
+            <div class="quote">
+                "Data scientists aren't trained in psychometrics or psychological theory"
             </div>
         </div>
-        
-        <div class="game-area">
-            <div class="diagram-container">
-                <svg id="diagram">
-                    <defs>
-                        <marker id="arrowhead" markerWidth="10" markerHeight="7" 
-                                refX="9" refY="3.5" orient="auto">
-                            <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
-                        </marker>
-                    </defs>
-                </svg>
+    </div>
+
+    <!-- Slide 5: What if framework existed -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2>What If A Coherent Framework Existed?</h2>
+            <p>Imagine understanding entertainment through:</p>
+            <div class="framework-grid">
+                <div class="framework-card">
+                    <h3>🧠 Predictive Mind</h3>
+                    <p>How brains minimize surprise</p>
+                </div>
+                <div class="framework-card">
+                    <h3>🏛️ Cognitive Anthropology</h3>
+                    <p>Universal mental mechanisms</p>
+                </div>
+                <div class="framework-card">
+                    <h3>🎯 Entertainment Psychology</h3>
+                    <p>Decades of rigorous measurement</p>
+                </div>
+                <div class="framework-card">
+                    <h3>📊 Statistical & Causal Tools</h3>
+                    <p>Valid metrics and data analysis</p>
+                </div>
             </div>
-            
-            <div class="controls">
-                <div class="level-indicator">Level <span id="current-level">1</span></div>
-                
-                <div class="question" id="question">
-                    <h3>Find the Confounders!</h3>
-                    <p>Click on variables that need to be controlled to satisfy the backdoor criterion for estimating the causal effect of <strong>Treatment</strong> on <strong>Outcome</strong>.</p>
+            <p class="highlight" style="margin-top: 30px;">Whoever understands the audience's mind best will win</p>
+        </div>
+    </div>
+
+    <!-- Slide 6: Rosetta Stone -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2>A Rosetta Stone for Entertainment</h2>
+            <div class="story-section">
+                <p>This book provides translation between:</p>
+                <ul>
+                    <li><strong>Industry intuition</strong> → Measurable psychological phenomena</li>
+                    <li><strong>Screenwriting lore</strong> → Scientific frameworks</li>
+                    <li><strong>Gut feelings</strong> → Quantifiable metrics</li>
+                </ul>
+            </div>
+            <div class="quote">
+                "Issues like pacing, character appeal, suspense—often cited by critics—are connected to quantifiable psychological phenomena researchers have thoroughly dissected"
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Definition Challenge -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2>What Is Entertainment, Really?</h2>
+            <div class="framework-grid">
+                <div class="framework-card">
+                    <h3>❌ Traditional View</h3>
+                    <p>Zillmann: "Activity designed to delight and... enlighten through the exhibition of the fortunes or misfortunes of others..."</p>
+                    <p>Vorderer: Cognitive "play"</p>
                 </div>
-                
-                <button class="btn-primary" id="check-answer">Check Answer</button>
-                <button class="btn-secondary" id="show-paths">Show Paths</button>
-                <button class="btn-secondary" id="hint-btn">Hint</button>
-                <button class="btn-danger" id="next-level">Next Level</button>
-                
-                <div id="feedback" class="feedback" style="display: none;"></div>
-                
-                <div class="hint" id="hint" style="display: none;">
-                    <strong>💡 Hint:</strong> <span id="hint-text"></span>
+                <div class="framework-card">
+                    <h3>✅ New Definition</h3>
+                    <p>Entertainment as <strong>technology</strong> for capturing attention</p>
+                    <p>Serves storyteller's goals, not just audience pleasure</p>
                 </div>
-                
-                <div class="paths-display" id="paths-display" style="display: none;">
-                    <h4>Causal Paths:</h4>
-                    <div id="paths-list"></div>
+            </div>
+            <p class="highlight">Entertainment exists because it benefits the storyteller's goals</p>
+        </div>
+    </div>
+
+    <!-- Slide 8: Automobile Metaphor -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2>The Automobile Metaphor</h2>
+            <div class="metaphor-box">
+                <p>Cars aren't designed purely for passenger comfort—they serve manufacturer goals</p>
+                <ul>
+                    <li><strong>Ad-supported cars:</strong> Maximize time in vehicle</li>
+                    <li><strong>Subscription cars:</strong> Maximize fleet turnover</li>
+                    <li><strong>Planned obsolescence:</strong> Ensure repeat purchases</li>
+                </ul>
+            </div>
+            <p>Similarly:</p>
+            <ul>
+                <li><strong>Theatrical films:</strong> Pack in thrills, happy endings</li>
+                <li><strong>Streaming series:</strong> Cliffhangers, binge-worthiness</li>
+                <li><strong>Branded content:</strong> Nudge toward purchase</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Slide 9: Superstimuli -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2>Entertainment & Superstimuli</h2>
+            <p>Entertainment exploits evolved mental mechanisms:</p>
+            <div class="framework-grid">
+                <div class="framework-card">
+                    <h3>🦁 Predator Detection</h3>
+                    <p>Monsters, chase scenes</p>
+                </div>
+                <div class="framework-card">
+                    <h3>💕 Mate Selection</h3>
+                    <p>Attractive characters, romance</p>
+                </div>
+                <div class="framework-card">
+                    <h3>🤝 Social Dynamics</h3>
+                    <p>Betrayal, cooperation, status</p>
+                </div>
+                <div class="framework-card">
+                    <h3>⚡ Competence Display</h3>
+                    <p>Skills, heroism, mastery</p>
+                </div>
+                <div class="framework-card">
+                    <h3>🦠 Pathogen Avoidance</h3>
+                    <p>Parasites, skin disease, deformity</p>
+                </div>
+                <div class="framework-card">
+                    <h3>🌪️ Intuitive Physics</h3>
+                    <p>Flying, teleportation, Rube Goldberg</p>
+                </div>
+                <div class="framework-card">
+                    <h3>🏔️ Landscape Evaluation</h3>
+                    <p>Resource and threat potential</p>
+                </div>
+                <div class="framework-card">
+                    <h3>🍖 Food Detection</h3>
+                    <p>Feasting, delicacies, abundance</p>
+                </div>
+                <div class="framework-card">
+                    <h3>👶 Cuteness</h3>
+                    <p>Babies, parental protection</p>
+                </div>
+            </div>
+            <p class="highlight">75 evolved mechanisms that entertainment hacks into (Dubourg et al.)</p>
+        </div>
+    </div>
+
+    <!-- Slide 10: Character Likability -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2>Character Likability Science</h2>
+            <div class="story-section">
+                <p><strong>The Industry Question:</strong> "Is this character likable?"</p>
+                <p><strong>The Science:</strong> Audiences evaluate characters primarily through morality</p>
+            </div>
+            <div class="framework-grid">
+                <div class="framework-card">
+                    <h3>🎯 Moral Intuitions</h3>
+                    <p>Courage, tradition, and family</p>
+                </div>
+                <div class="framework-card">
+                    <h3>🧠 Person Perception</h3>
+                    <p>Competence, warmth, moral character</p>
+                </div>
+                <div class="framework-card">
+                    <h3>📊 Disposition Theory</h3>
+                    <p>Measurable audience-character relationships</p>
+                </div>
+                <div class="framework-card">
+                    <h3>⚡ Excitation Transfer Theory</h3>
+                    <p>Character-centric structural explanation for suspense</p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Slide 11: Suspense Science -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2>The True Nature of Suspense</h2>
+            <div class="story-section">
+                <h3>🎭 The Hiding from Nazis Example</h3>
+                <p>Audience ≠ Character</p>
+                <p>We don't "identify" with characters—we judge them</p>
+            </div>
+            <div class="framework-grid">
+                <div class="framework-card">
+                    <h3>❌ Old Theory</h3>
+                    <p>Excitation transfer</p>
+                    <p>Paradox of suspense</p>
+                </div>
+                <div class="framework-card">
+                    <h3>✅ New Understanding</h3>
+                    <p>Predictive mind theory</p>
+                    <p>"Honest placebo" effect</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 12: Success Metrics -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2>Defining Success</h2>
+            <p>What are you optimizing for?</p>
+            <div class="framework-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div class="framework-card" style="padding: 20px;">
+                    <h3 style="font-size: 1.4rem;">💰 Commercial</h3>
+                    <p style="font-size: 1rem;">Box office, subscribers, retention</p>
+                </div>
+                <div class="framework-card" style="padding: 20px;">
+                    <h3 style="font-size: 1.4rem;">🏆 Critical</h3>
+                    <p style="font-size: 1rem;">Awards, acclaim, prestige</p>
+                </div>
+                <div class="framework-card" style="padding: 20px;">
+                    <h3 style="font-size: 1.4rem;">📊 Engagement</h3>
+                    <p style="font-size: 1rem;">Time spent, completion rates</p>
+                </div>
+                <div class="framework-card" style="padding: 20px;">
+                    <h3 style="font-size: 1.4rem;">🎯 Strategic</h3>
+                    <p style="font-size: 1rem;">Brand awareness, franchise potential</p>
+                </div>
+            </div>
+            <div class="quote">
+                "Entertainment psychology distinguishes enjoyment vs. appreciation—with measurable, brain-scan validated differences"
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 13: Call to Action -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2>The Bridge We Must Build</h2>
+            <div class="metaphor-box">
+                <h3>🌉 For Industry:</h3>
+                <p>Upgrade vocabulary, ask better questions, make data meaningful</p>
+                <h3>🔬 For Academia:</h3>
+                <p>Do research that impacts industry, create unified framework to generate innovation</p>
+            </div>
+            <p>This isn't just about maximizing ROI—it's about:</p>
+            <ul>
+                <li>Creating more compelling stories with precision</li>
+                <li>Understanding what grabs and holds attention</li>
+                <li>Using that attention for any goal: entertainment, activism, education</li>
+            </ul>
+            <div class="quote">
+                "Like Mendel's genetics eventually saved billions of lives, entertainment science could reshape how stories are made"
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 14: Conclusion -->
+    <div class="slide-container">
+        <div class="slide">
+            <h1>Entertainment Science</h1>
+            <h2 class="highlight">The Future is Scientific Storytelling</h2>
+            <div class="framework-grid">
+                <div class="framework-card">
+                    <h3>🎯 Studios</h3>
+                    <p>Look to entertainment scholars</p>
+                    <p>Psychology > Screenwriting lore</p>
+                </div>
+                <div class="framework-card">
+                    <h3>🔬 Academics</h3>
+                    <p>Entertainment as attention technology</p>
+                    <p>Industry-impacting research</p>
+                </div>
+            </div>
+            <p style="font-size: 1.5rem; margin-top: 40px;">Questions?</p>
+            <div style="margin-top: 30px;">
+                <span class="emoji">🎬</span>
+                <span class="emoji">🤝</span>
+                <span class="emoji">🔬</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" onclick="previousSlide()">← Previous</button>
+        <button class="nav-btn" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <button class="references-btn" id="referencesBtn" onclick="showReferences()">Refs</button>
+
+    <div class="references-modal" id="referencesModal" onclick="hideReferences()">
+        <div class="references-content" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="hideReferences()">×</button>
+            <h3>References</h3>
+            <div id="referencesText"></div>
+        </div>
+    </div>
+
     <script>
-        class CausalInferenceGame {
-            constructor() {
-                this.score = 0;
-                this.level = 1;
-                this.streak = 0;
-                this.selectedNodes = new Set();
-                this.showingPaths = false;
-                this.currentDiagram = null;
-                
-                this.levels = [
-                    {
-                        nodes: [
-                            {id: 'T', x: 150, y: 200, label: 'Treatment', type: 'treatment'},
-                            {id: 'Y', x: 450, y: 200, label: 'Outcome', type: 'outcome'},
-                            {id: 'C', x: 300, y: 100, label: 'Confounder', type: 'confounder'}
-                        ],
-                        edges: [
-                            {from: 'C', to: 'T'},
-                            {from: 'C', to: 'Y'},
-                            {from: 'T', to: 'Y'}
-                        ],
-                        correctAnswer: ['C'],
-                        explanation: "C is a confounder that creates a backdoor path T ← C → Y. Control C to block this path.",
-                        hint: "Look for variables that point to both treatment and outcome!"
-                    },
-                    {
-                        nodes: [
-                            {id: 'T', x: 150, y: 250, label: 'Treatment', type: 'treatment'},
-                            {id: 'Y', x: 500, y: 250, label: 'Outcome', type: 'outcome'},
-                            {id: 'C1', x: 250, y: 150, label: 'Confounder1', type: 'confounder'},
-                            {id: 'C2', x: 400, y: 150, label: 'Confounder2', type: 'confounder'},
-                            {id: 'M', x: 325, y: 350, label: 'Mediator', type: 'mediator'}
-                        ],
-                        edges: [
-                            {from: 'C1', to: 'T'},
-                            {from: 'C1', to: 'C2'},
-                            {from: 'C2', to: 'Y'},
-                            {from: 'T', to: 'M'},
-                            {from: 'M', to: 'Y'},
-                            {from: 'T', to: 'Y'}
-                        ],
-                        correctAnswer: ['C1'],
-                        explanation: "Only C1 needs to be controlled. It blocks the backdoor path T ← C1 → C2 → Y. Don't control M (mediator)!",
-                        hint: "Find the backdoor path and identify the minimum set to block it. Don't control mediators!"
-                    },
-                    {
-                        nodes: [
-                            {id: 'T', x: 150, y: 300, label: 'Treatment', type: 'treatment'},
-                            {id: 'Y', x: 500, y: 300, label: 'Outcome', type: 'outcome'},
-                            {id: 'C1', x: 200, y: 150, label: 'Confounder1', type: 'confounder'},
-                            {id: 'C2', x: 450, y: 150, label: 'Confounder2', type: 'confounder'},
-                            {id: 'U', x: 325, y: 50, label: 'Unobserved', type: 'unobserved'},
-                            {id: 'Coll', x: 325, y: 400, label: 'Collider', type: 'collider'}
-                        ],
-                        edges: [
-                            {from: 'U', to: 'C1'},
-                            {from: 'U', to: 'C2'},
-                            {from: 'C1', to: 'T'},
-                            {from: 'C2', to: 'Y'},
-                            {from: 'T', to: 'Coll'},
-                            {from: 'Y', to: 'Coll'},
-                            {from: 'T', to: 'Y'}
-                        ],
-                        correctAnswer: ['C1', 'C2'],
-                        explanation: "Both C1 and C2 must be controlled to block the backdoor path T ← C1 ← U → C2 → Y. Don't control the collider!",
-                        hint: "When there's an unobserved confounder, you need to control its observed children that are on the backdoor path."
-                    },
-                    {
-                        nodes: [
-                            {id: 'T', x: 100, y: 250, label: 'Treatment', type: 'treatment'},
-                            {id: 'Y', x: 550, y: 250, label: 'Outcome', type: 'outcome'},
-                            {id: 'C1', x: 200, y: 150, label: 'Conf1', type: 'confounder'},
-                            {id: 'C2', x: 325, y: 100, label: 'Conf2', type: 'confounder'},
-                            {id: 'C3', x: 450, y: 150, label: 'Conf3', type: 'confounder'},
-                            {id: 'M1', x: 250, y: 350, label: 'Med1', type: 'mediator'},
-                            {id: 'M2', x: 400, y: 350, label: 'Med2', type: 'mediator'}
-                        ],
-                        edges: [
-                            {from: 'C2', to: 'C1'},
-                            {from: 'C2', to: 'C3'},
-                            {from: 'C1', to: 'T'},
-                            {from: 'C3', to: 'Y'},
-                            {from: 'T', to: 'M1'},
-                            {from: 'M1', to: 'M2'},
-                            {from: 'M2', to: 'Y'},
-                            {from: 'T', to: 'Y'}
-                        ],
-                        correctAnswer: ['C2'],
-                        explanation: "Only C2 needs to be controlled! It blocks the backdoor path T ← C1 ← C2 → C3 → Y. Controlling C2 is sufficient.",
-                        hint: "Look for the most upstream confounder that can block all backdoor paths with minimal controls."
-                    },
-                    {
-                        nodes: [
-                            {id: 'T', x: 150, y: 300, label: 'Treatment', type: 'treatment'},
-                            {id: 'Y', x: 500, y: 300, label: 'Outcome', type: 'outcome'},
-                            {id: 'C1', x: 250, y: 150, label: 'Conf1', type: 'confounder'},
-                            {id: 'C2', x: 400, y: 150, label: 'Conf2', type: 'confounder'},
-                            {id: 'Coll1', x: 175, y: 200, label: 'Coll1', type: 'collider'},
-                            {id: 'Coll2', x: 475, y: 200, label: 'Coll2', type: 'collider'},
-                            {id: 'Desc', x: 325, y: 400, label: 'Descendant', type: 'descendant'}
-                        ],
-                        edges: [
-                            {from: 'C1', to: 'Coll1'},
-                            {from: 'T', to: 'Coll1'},
-                            {from: 'C2', to: 'Coll2'},
-                            {from: 'Y', to: 'Coll2'},
-                            {from: 'C1', to: 'C2'},
-                            {from: 'Coll2', to: 'Desc'},
-                            {from: 'T', to: 'Y'}
-                        ],
-                        correctAnswer: [],
-                        explanation: "No controls needed! All backdoor paths go through colliders, which naturally block the paths. Controlling colliders would open them!",
-                        hint: "Sometimes the best strategy is to control nothing! Check if backdoor paths are already blocked by colliders."
-                    }
-                ];
-                
-                this.initializeGame();
-                this.setupEventListeners();
-                this.loadLevel();
-            }
+        let currentSlide = 0;
+        const slideContainers = document.querySelectorAll('.slide-container');
+        const totalSlides = slideContainers.length;
+        
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        // References data for each slide (0-indexed)
+        const slideReferences = {
+            1: [
+                'Field, S. (1982). <em>Screenplay</em> (p. 10). New York: Delacorte.',
+                'McKee, R. (1997). Story: Substance, structure, style, and the principles of screenwriting. <em>Alba Editorial</em>.',
+                'Snyder, B. (2023). <em>SAVE THE CAT!®</em>. Noura Books.',
+                'Tamborini, R. (2024). Media <em>Entertainment Theory and Research: Still an amorphous area</em> In N.D. Bowman (Ed.) <em>Entertainment Media and Communication</em> (Vol. 20). Walter de Gruyter GmbH & Co KG.',
+                'Tannenbaum, P. H. (2014). An unstructured introduction to an amorphous area. In <em>The entertainment functions of television</em> (pp. 1-12). Psychology Press.'
+            ],
+            2: [
+                'National Human Genome Research Institute. (n.d.). 1900: Rediscovery of Mendel\'s work. Online Education Kit. https://www.genome.gov/25520238/online-education-kit-1900-rediscovery-of-mendels-work',
+                'Syngenta. (n.d.). The gardener monk\'s genetic revolution: From Mendel\'s pea plants to the breakthroughs of CRISPR. <em>Syngenta</em>. https://www.syngenta.com/agriculture/agricultural-technology/gardener-monks-genetic-revolution'
+            ],
+            4: [
+                'Andersen, M. M., Kiverstein, J., Miller, M., & Roepstorff, A. (2023). Play in predictive minds: A cognitive theory of play. <em>Psychological Review</em>, <em>130</em>(2), 462.',
+                'Bowman, N. D. (Ed.). (2024). <em>Entertainment Media and Communication</em> (Vol. 20). Walter de Gruyter GmbH & Co KG.',
+                'Clark, A. (2024). <em>The experience machine: How our minds predict and shape reality</em>. Random House.',
+                'Dubourg, E., & Baumard, N. (2022). Why and how did narrative fictions evolve? Fictions as entertainment technologies. <em>Frontiers in Psychology</em>, <em>13</em>, 786770.',
+                'Friston, K. (2010). The free-energy principle: a unified brain theory?. <em>Nature reviews neuroscience</em>, <em>11</em>(2), 127-138.'
+            ],
+            6: [
+                'Zillmann, D., & Bryant, J. (1994). Entertainment as media effect. In D. Zillmann & J. Bryant (Eds.), <em>Media effects: Advances in theory and research</em> (pp. 437–462). Hillsdale, NJ: Lawrence Erlbaum.'
+            ],
+            8: [
+                'Barrett, D. (2015). Supernormal Stimuli in the Media. <em>Internet, film, news, gossip: an evolutionary perspective on the media. Retrieved June</em>, <em>24</em>(2), 130-153.',
+                'Dubourg, E., Thouzeau, V., Beuchot, T., Bonard, C., Boyer, P., Chevallier, C., Clasen, M., Boon-Falleur, M., Fiorio, G., Fitouchi, L., Fisher, M. L., Gantman, A., Grant, A., Hye-Knudsen, M., Katiyar, T., Kjeldgaard-Christiansen, J., Mercier, M., Mercier, H., Morin, O., . . . Baumard, N. (n.d.). <em>Explaining the diversity and variability of fictions: An evolutionary framework</em> [Preprint]. OSF. https://osf.io/preprints/osf/me6bz_v1'
+            ],
+            9: [
+                'Curry, O. S. (2016). Morality as cooperation: A problem-centred approach. <em>The evolution of morality</em>, 27-51.',
+                'Graham, J., Haidt, J., Koleva, S., Motyl, M., Iyer, R., Wojcik, S. P., & Ditto, P. H. (2013). Moral foundations theory: The pragmatic validity of moral pluralism. In <em>Advances in experimental social psychology</em> (Vol. 47, pp. 55-130). Academic Press.',
+                'Raney, A. A. (2004). Expanding disposition theory: Reconsidering character liking, moral evaluations, and enjoyment. <em>Communication theory</em>, <em>14</em>(4), 348-369.',
+                'Wojciszke, B. (2005). Morality and competence in person-and self-perception. <em>European review of social psychology</em>, <em>16</em>(1), 155-188.',
+                'Zillmann, D. (2008). Excitation transfer theory. <em>The international encyclopedia of communication</em>.'
+            ]
+        };
+
+        function showSlide(n) {
+            slideContainers[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slideContainers[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
             
-            initializeGame() {
-                document.getElementById('score').textContent = this.score;
-                document.getElementById('level').textContent = this.level;
-                document.getElementById('current-level').textContent = this.level;
-                document.getElementById('streak').textContent = this.streak;
-            }
-            
-            setupEventListeners() {
-                document.getElementById('check-answer').addEventListener('click', () => this.checkAnswer());
-                document.getElementById('show-paths').addEventListener('click', () => this.togglePaths());
-                document.getElementById('hint-btn').addEventListener('click', () => this.showHint());
-                document.getElementById('next-level').addEventListener('click', () => this.nextLevel());
-            }
-            
-            loadLevel() {
-                if (this.level > this.levels.length) {
-                    this.showVictory();
-                    return;
-                }
-                
-                this.currentDiagram = this.levels[this.level - 1];
-                this.selectedNodes.clear();
-                this.showingPaths = false;
-                
-                document.getElementById('feedback').style.display = 'none';
-                document.getElementById('hint').style.display = 'none';
-                document.getElementById('paths-display').style.display = 'none';
-                document.getElementById('next-level').style.display = 'none';
-                
-                this.renderDiagram();
-            }
-            
-            renderDiagram() {
-                const svg = document.getElementById('diagram');
-                svg.innerHTML = `
-                    <defs>
-                        <marker id="arrowhead" markerWidth="10" markerHeight="7" 
-                                refX="9" refY="3.5" orient="auto">
-                            <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
-                        </marker>
-                    </defs>
-                `;
-                
-                // Draw edges first
-                this.currentDiagram.edges.forEach(edge => {
-                    const fromNode = this.currentDiagram.nodes.find(n => n.id === edge.from);
-                    const toNode = this.currentDiagram.nodes.find(n => n.id === edge.to);
-                    
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttributeNS(null, 'x1', fromNode.x);
-                    line.setAttributeNS(null, 'y1', fromNode.y);
-                    line.setAttributeNS(null, 'x2', toNode.x);
-                    line.setAttributeNS(null, 'y2', toNode.y);
-                    line.setAttributeNS(null, 'class', 'edge');
-                    line.setAttributeNS(null, 'data-from', edge.from);
-                    line.setAttributeNS(null, 'data-to', edge.to);
-                    svg.appendChild(line);
-                });
-                
-                // Draw nodes
-                this.currentDiagram.nodes.forEach(node => {
-                    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                    group.setAttributeNS(null, 'class', `node ${node.type}`);
-                    group.setAttributeNS(null, 'data-id', node.id);
-                    
-                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    circle.setAttributeNS(null, 'cx', node.x);
-                    circle.setAttributeNS(null, 'cy', node.y);
-                    circle.setAttributeNS(null, 'r', 25);
-                    
-                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    text.setAttributeNS(null, 'x', node.x);
-                    text.setAttributeNS(null, 'y', node.y);
-                    text.textContent = node.label;
-                    
-                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    label.setAttributeNS(null, 'x', node.x);
-                    label.setAttributeNS(null, 'y', node.y + 45);
-                    label.setAttributeNS(null, 'text-anchor', 'middle');
-                    label.setAttributeNS(null, 'font-size', '12');
-                    label.setAttributeNS(null, 'fill', '#333');
-                    label.textContent = node.label;
-                    
-                    group.appendChild(circle);
-                    group.appendChild(text);
-                    group.appendChild(label);
-                    
-                    if (node.type !== 'treatment' && node.type !== 'outcome') {
-                        group.addEventListener('click', () => this.toggleNode(node.id));
-                    }
-                    
-                    svg.appendChild(group);
-                });
-            }
-            
-            toggleNode(nodeId) {
-                if (this.selectedNodes.has(nodeId)) {
-                    this.selectedNodes.delete(nodeId);
-                } else {
-                    this.selectedNodes.add(nodeId);
-                }
-                this.updateNodeAppearance();
-            }
-            
-            updateNodeAppearance() {
-                document.querySelectorAll('.node').forEach(node => {
-                    const nodeId = node.getAttribute('data-id');
-                    node.classList.remove('selected', 'blocked');
-                    
-                    if (this.selectedNodes.has(nodeId)) {
-                        node.classList.add('selected');
-                    }
-                });
-            }
-            
-            checkAnswer() {
-                const correct = this.currentDiagram.correctAnswer;
-                const selected = Array.from(this.selectedNodes);
-                
-                const isCorrect = correct.length === selected.length && 
-                                correct.every(node => selected.includes(node));
-                
-                const feedback = document.getElementById('feedback');
-                feedback.style.display = 'block';
-                
-                if (isCorrect) {
-                    feedback.className = 'feedback correct';
-                    feedback.textContent = '🎉 Correct! ' + this.currentDiagram.explanation;
-                    this.score += 100 * this.level;
-                    this.streak++;
-                    document.getElementById('next-level').style.display = 'block';
-                    
-                    // Mark controlled nodes as blocked
-                    this.selectedNodes.forEach(nodeId => {
-                        const node = document.querySelector(`[data-id="${nodeId}"]`);
-                        if (node) node.classList.add('blocked');
-                    });
-                } else {
-                    feedback.className = 'feedback incorrect';
-                    feedback.textContent = '❌ Not quite right. Try again! ' + 
-                        (correct.length === 0 ? 'Hint: Sometimes no controls are needed!' : 
-                         `Hint: You need to control ${correct.length} variable(s).`);
-                    this.streak = 0;
-                }
-                
-                this.updateStats();
-            }
-            
-            togglePaths() {
-                this.showingPaths = !this.showingPaths;
-                const pathsDisplay = document.getElementById('paths-display');
-                
-                if (this.showingPaths) {
-                    this.highlightPaths();
-                    pathsDisplay.style.display = 'block';
-                    document.getElementById('show-paths').textContent = 'Hide Paths';
-                } else {
-                    this.clearPathHighlights();
-                    pathsDisplay.style.display = 'none';
-                    document.getElementById('show-paths').textContent = 'Show Paths';
-                }
-            }
-            
-            highlightPaths() {
-                // Find all paths from treatment to outcome
-                const paths = this.findAllPaths('T', 'Y');
-                const pathsList = document.getElementById('paths-list');
-                pathsList.innerHTML = '';
-                
-                paths.forEach((path, index) => {
-                    const pathDiv = document.createElement('div');
-                    const isBackdoor = this.isBackdoorPath(path);
-                    const isBlocked = this.isPathBlocked(path);
-                    
-                    pathDiv.className = `path ${isBackdoor ? 'backdoor' : 'direct'} ${isBlocked ? 'blocked' : ''}`;
-                    pathDiv.innerHTML = `
-                        <strong>${isBackdoor ? 'Backdoor' : 'Direct'} Path:</strong> ${path.join(' → ')}<br>
-                        <small>${isBlocked ? '🚫 Blocked' : (isBackdoor ? '⚠️ Open backdoor' : '✅ Causal path')}</small>
-                    `;
-                    pathsList.appendChild(pathDiv);
-                    
-                    // Highlight edges in this path
-                    for (let i = 0; i < path.length - 1; i++) {
-                        const edge = document.querySelector(`[data-from="${path[i]}"][data-to="${path[i+1]}"], [data-from="${path[i+1]}"][data-to="${path[i]}"]`);
-                        if (edge) {
-                            edge.classList.add(isBackdoor ? 'backdoor-path' : 'direct-path');
-                            if (isBlocked) edge.classList.add('blocked-path');
-                        }
-                    }
-                });
-            }
-            
-            clearPathHighlights() {
-                document.querySelectorAll('.edge').forEach(edge => {
-                    edge.classList.remove('backdoor-path', 'direct-path', 'blocked-path');
-                });
-            }
-            
-            findAllPaths(start, end, visited = new Set(), currentPath = []) {
-                visited.add(start);
-                currentPath.push(start);
-                
-                if (start === end) {
-                    const pathCopy = [...currentPath];
-                    visited.delete(start);
-                    currentPath.pop();
-                    return [pathCopy];
-                }
-                
-                const paths = [];
-                const neighbors = this.getNeighbors(start);
-                
-                for (const neighbor of neighbors) {
-                    if (!visited.has(neighbor)) {
-                        const subPaths = this.findAllPaths(neighbor, end, visited, currentPath);
-                        paths.push(...subPaths);
-                    }
-                }
-                
-                visited.delete(start);
-                currentPath.pop();
-                return paths;
-            }
-            
-            getNeighbors(nodeId) {
-                const neighbors = [];
-                this.currentDiagram.edges.forEach(edge => {
-                    if (edge.from === nodeId) {
-                        neighbors.push(edge.to);
-                    } else if (edge.to === nodeId) {
-                        neighbors.push(edge.from);
-                    }
-                });
-                return neighbors;
-            }
-            
-            isBackdoorPath(path) {
-                // A backdoor path starts with an arrow pointing TO the treatment
-                if (path.length < 3) return false;
-                const firstEdge = this.currentDiagram.edges.find(e => 
-                    (e.from === path[1] && e.to === path[0]) || 
-                    (e.from === path[0] && e.to === path[1])
-                );
-                return firstEdge && firstEdge.to === path[0]; // Arrow points TO treatment
-            }
-            
-            isPathBlocked(path) {
-                // Check if path is blocked by selected nodes or colliders
-                for (let i = 1; i < path.length - 1; i++) {
-                    const node = path[i];
-                    
-                    // If we've selected this node, the path is blocked
-                    if (this.selectedNodes.has(node)) {
-                        return true;
-                    }
-                    
-                    // Check if this is a collider (arrows pointing into it from both sides)
-                    const prevNode = path[i - 1];
-                    const nextNode = path[i + 1];
-                    
-                    const edge1 = this.currentDiagram.edges.find(e => 
-                        (e.from === prevNode && e.to === node) || (e.from === node && e.to === prevNode)
-                    );
-                    const edge2 = this.currentDiagram.edges.find(e => 
-                        (e.from === nextNode && e.to === node) || (e.from === node && e.to === nextNode)
-                    );
-                    
-                    if (edge1 && edge2 && edge1.to === node && edge2.to === node) {
-                        // This is a collider - path is blocked unless we control it or its descendants
-                        if (!this.selectedNodes.has(node)) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-            
-            showHint() {
-                const hint = document.getElementById('hint');
-                const hintText = document.getElementById('hint-text');
-                hintText.textContent = this.currentDiagram.hint;
-                hint.style.display = 'block';
-            }
-            
-            nextLevel() {
-                this.level++;
-                document.getElementById('level').textContent = this.level;
-                document.getElementById('current-level').textContent = this.level;
-                this.loadLevel();
-            }
-            
-            updateStats() {
-                document.getElementById('score').textContent = this.score;
-                document.getElementById('streak').textContent = this.streak;
-            }
-            
-            showVictory() {
-                const svg = document.getElementById('diagram');
-                svg.innerHTML = `
-                    <text x="300" y="200" text-anchor="middle" font-size="24" fill="#4CAF50" font-weight="bold">
-                        🎉 Congratulations! 🎉
-                    </text>
-                    <text x="300" y="240" text-anchor="middle" font-size="18" fill="#333">
-                        You've mastered Pearl's Backdoor Criterion!
-                    </text>
-                    <text x="300" y="280" text-anchor="middle" font-size="16" fill="#666">
-                        Final Score: ${this.score} | Max Streak: ${this.streak}
-                    </text>
-                `;
-                
-                const feedback = document.getElementById('feedback');
-                feedback.style.display = 'block';
-                feedback.className = 'feedback correct';
-                feedback.innerHTML = `
-                    <h3>🏆 Master Detective Achievement Unlocked!</h3>
-                    <p>You've successfully learned to identify confounders and apply the backdoor criterion. 
-                    You now understand one of the most important concepts in causal inference!</p>
-                    <p><strong>Key concepts mastered:</strong></p>
-                    <ul style="text-align: left; margin-top: 10px;">
-                        <li>Identifying backdoor paths</li>
-                        <li>Controlling confounders</li>
-                        <li>Avoiding collider bias</li>
-                        <li>Not controlling mediators</li>
-                        <li>Minimal sufficient adjustment sets</li>
-                    </ul>
-                `;
-                
-                // Hide unnecessary buttons
-                document.getElementById('check-answer').style.display = 'none';
-                document.getElementById('next-level').style.display = 'none';
-                document.getElementById('show-paths').style.display = 'none';
-                document.getElementById('hint-btn').style.display = 'none';
+            // Show/hide references button based on whether current slide has references
+            const referencesBtn = document.getElementById('referencesBtn');
+            if (slideReferences[currentSlide]) {
+                referencesBtn.classList.add('visible');
+            } else {
+                referencesBtn.classList.remove('visible');
             }
         }
-        
-        // Start the game when the page loads
-        window.addEventListener('DOMContentLoaded', () => {
-            new CausalInferenceGame();
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function previousSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        function showReferences() {
+            const modal = document.getElementById('referencesModal');
+            const referencesText = document.getElementById('referencesText');
+            const refs = slideReferences[currentSlide];
+            
+            if (refs) {
+                referencesText.innerHTML = refs.map(ref => 
+                    `<div class="reference">${ref}</div>`
+                ).join('');
+                modal.classList.add('active');
+            }
+        }
+
+        function hideReferences() {
+            const modal = document.getElementById('referencesModal');
+            modal.classList.remove('active');
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                previousSlide();
+            } else if (e.key === 'Escape') {
+                hideReferences();
+            }
         });
+
+        // Initialize
+        showSlide(0);
     </script>
 </body>
 </html>
