@@ -408,51 +408,19 @@
                 font-size: 12px;
             }
 
+            /* Hide navigation buttons on mobile */
             .navigation {
-                bottom: 15px;
-                gap: 8px;
+                display: none;
             }
 
-            .nav-btn {
-                padding: 10px 12px;
-                font-size: 12px;
-                border-radius: 15px;
-                min-width: auto;
-            }
-
-            /* Simplify button text on mobile */
-            .nav-btn:first-child::before {
-                content: "←";
-            }
-            
-            .nav-btn:last-child::before {
-                content: "→";
-            }
-
-            .nav-btn {
-                text-indent: -9999px;
-                overflow: hidden;
-                position: relative;
-                width: 40px;
-                height: 40px;
-                padding: 0;
-            }
-
-            .nav-btn::before {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                text-indent: 0;
-                font-size: 16px;
-                font-weight: bold;
-            }
-
+            /* Also hide references button on mobile and move it to top */
             .references-btn {
-                bottom: 15px;
+                bottom: auto;
+                top: 60px;
                 right: 15px;
-                padding: 10px 15px;
-                font-size: 11px;
+                padding: 8px 12px;
+                font-size: 10px;
+                border-radius: 12px;
             }
 
             .references-content {
@@ -734,7 +702,7 @@
             <div class="framework-grid">
                 <div class="framework-card">
                     <h3>🎯 Moral Intuitions</h3>
-                    <p>Courage, tradition, and family</p>
+                    <p>Courage, tradition, family, care, fairness, ingroup, purity</p>
                 </div>
                 <div class="framework-card">
                     <h3>🧠 Person Perception</h3>
@@ -961,6 +929,41 @@
             } else if (e.key === 'Escape') {
                 hideReferences();
             }
+        });
+
+        // Touch/Swipe navigation for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        function handleSwipe() {
+            const swipeThreshold = 50; // Minimum distance for a swipe
+            const horizontalDistance = Math.abs(touchEndX - touchStartX);
+            const verticalDistance = Math.abs(touchEndY - touchStartY);
+            
+            // Only trigger if horizontal swipe is greater than vertical (to avoid interfering with scrolling)
+            if (horizontalDistance > verticalDistance && horizontalDistance > swipeThreshold) {
+                if (touchEndX < touchStartX) {
+                    // Swiped left - go to next slide
+                    nextSlide();
+                } else if (touchEndX > touchStartX) {
+                    // Swiped right - go to previous slide
+                    previousSlide();
+                }
+            }
+        }
+
+        // Add touch event listeners
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
         });
 
         // Initialize
