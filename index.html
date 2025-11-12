@@ -3,8 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entertainment Science Presentation</title>
+    <title>StoryCabin Canyon Retreat Guidebook</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Source+Serif+4:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --sand: #f4f1ec;
+            --cloud: #ffffff;
+            --spruce: #2f4f4f;
+            --lake: #4c7a89;
+            --sage: #7aa49a;
+            --slate: #56606a;
+            --accent: #d4a373;
+            --shadow: rgba(47, 79, 79, 0.12);
+            --radius-lg: 22px;
+            --radius-sm: 12px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,965 +28,538 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
+            font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--sand);
+            color: var(--spruce);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        a {
+            color: var(--lake);
+            text-decoration: none;
+        }
+
+        a:hover,
+        a:focus {
+            text-decoration: underline;
+        }
+
+        header {
+            background: linear-gradient(145deg, rgba(76, 122, 137, 0.88), rgba(47, 79, 79, 0.92));
+            color: var(--cloud);
+            padding: 4.5rem 1.5rem 3.5rem;
+            position: relative;
+            text-align: center;
             overflow: hidden;
         }
 
-        .slide-container {
-            width: 100vw;
-            height: 100vh;
-            display: none;
-            align-items: center;
-            justify-content: center;
+        header::after {
+            content: '';
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(212, 163, 115, 0.45), transparent 55%);
+            pointer-events: none;
         }
 
-        .slide-container.active {
-            display: flex;
+        .header-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 680px;
+            margin: 0 auto;
         }
 
-        .slide {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 60px;
-            max-width: 90vw;
-            max-height: 90vh;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.6s ease;
-            overflow-y: auto;
+        .brand-mark {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
         }
 
-        .slide-container.active .slide {
-            opacity: 1;
-            transform: translateY(0);
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 18px rgba(17, 32, 32, 0.15);
         }
 
         h1 {
-            font-size: 3rem;
-            color: #4a5568;
-            margin-bottom: 30px;
-            font-weight: 700;
-            line-height: 1.2;
+            font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+            font-size: clamp(2.25rem, 7vw, 3.4rem);
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            line-height: 1.15;
+            margin-bottom: 0.85rem;
         }
 
-        h2 {
-            font-size: 2.5rem;
-            color: #667eea;
-            margin-bottom: 25px;
+        .tagline {
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.85);
+            max-width: 540px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .cta-row {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.85rem 1.3rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--cloud);
+            font-weight: 500;
+            font-size: 0.95rem;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 12px 24px rgba(27, 46, 46, 0.12);
+        }
+
+        .cta.primary {
+            background: var(--accent);
+            border-color: rgba(255, 255, 255, 0.22);
+            color: #1f1f1f;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(244, 241, 236, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(47, 79, 79, 0.08);
+        }
+
+        .nav-inner {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0.35rem 1.1rem;
+            display: flex;
+            gap: 0.4rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav-inner::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-link {
+            flex: 0 0 auto;
+            padding: 0.68rem 1rem;
+            font-size: 0.9rem;
+            color: var(--slate);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid transparent;
+            display: inline-flex;
+            gap: 0.45rem;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link:focus {
+            border-color: rgba(76, 122, 137, 0.25);
+            background: var(--cloud);
+            box-shadow: 0 6px 14px var(--shadow);
+        }
+
+        main {
+            flex: 1;
+            padding: 2.75rem 1.5rem 4rem;
+        }
+
+        .content {
+            max-width: 860px;
+            margin: 0 auto;
+            display: grid;
+            gap: 2.75rem;
+        }
+
+        section {
+            background: var(--cloud);
+            border-radius: var(--radius-lg);
+            padding: 2rem 1.75rem;
+            box-shadow: 0 18px 40px -24px rgba(17, 32, 32, 0.45);
+            border: 1px solid rgba(47, 79, 79, 0.08);
+        }
+
+        section h2 {
+            font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+            font-size: 1.7rem;
+            margin-bottom: 1.1rem;
+            color: var(--spruce);
+            display: flex;
+            align-items: baseline;
+            gap: 0.6rem;
+        }
+
+        section h3 {
+            font-size: 1.1rem;
+            margin-top: 1.4rem;
+            margin-bottom: 0.5rem;
+            color: var(--slate);
             font-weight: 600;
         }
 
-        h3 {
-            font-size: 1.8rem;
-            color: #764ba2;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        p {
-            font-size: 1.3rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            color: #4a5568;
+        p + p {
+            margin-top: 0.6rem;
         }
 
         ul {
-            text-align: left;
-            margin: 20px 0;
-            font-size: 1.2rem;
-            color: #4a5568;
+            list-style: none;
+            margin-top: 0.75rem;
+            display: grid;
+            gap: 0.55rem;
         }
 
         li {
-            margin: 15px 0;
-            padding-left: 10px;
+            position: relative;
+            padding-left: 1.4rem;
+            color: var(--slate);
+            font-size: 0.98rem;
         }
 
-        .quote {
-            font-style: italic;
-            font-size: 1.4rem;
-            color: #764ba2;
-            margin: 30px 0;
-            padding: 20px;
-            border-left: 4px solid #667eea;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 0 10px 10px 0;
-        }
-
-        .highlight {
-            background: linear-gradient(120deg, #667eea 0%, #764ba2 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 600;
-        }
-
-        .metaphor-box {
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 15px;
-            padding: 30px;
-            margin: 30px 0;
-            border: 2px solid rgba(102, 126, 234, 0.3);
-        }
-
-        .navigation {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
-            z-index: 1000;
-        }
-
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            padding: 15px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #4a5568;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-btn:hover {
-            background: rgba(102, 126, 234, 0.9);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .slide-counter {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: 600;
-            color: #4a5568;
-            z-index: 1000;
-        }
-
-        .url-display {
-            position: fixed;
-            top: 30px;
-            left: 30px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: 600;
-            color: #4a5568;
-            z-index: 1000;
-            font-size: 14px;
-        }
-
-        .framework-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .framework-card {
-            background: rgba(118, 75, 162, 0.1);
-            padding: 25px;
-            border-radius: 15px;
-            border: 2px solid rgba(118, 75, 162, 0.3);
-            transition: transform 0.3s ease;
-        }
-
-        .framework-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .story-section {
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 15px;
-            padding: 25px;
-            margin: 25px 0;
-            text-align: left;
-        }
-
-        .emoji {
-            font-size: 2rem;
-            margin: 0 10px;
-        }
-
-        .references-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 120px;
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            padding: 8px 12px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            color: #4a5568;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1001;
-            display: none;
-        }
-
-        .references-btn:hover {
-            background: rgba(102, 126, 234, 0.9);
-            color: white;
-            transform: translateY(-1px);
-        }
-
-        .references-btn.visible {
-            display: block;
-        }
-
-        .references-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-
-        .references-modal.active {
-            display: flex;
-        }
-
-        .references-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 80vw;
-            max-height: 70vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .references-content h3 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-        }
-
-        .references-content .reference {
-            margin-bottom: 15px;
-            font-size: 1rem;
-            line-height: 1.5;
-            color: #333;
-        }
-
-        .close-btn {
+        li::before {
+            content: '✦';
+            font-size: 0.7rem;
             position: absolute;
-            top: 15px;
-            right: 20px;
-            background: none;
-            border: none;
-            font-size: 24px;
+            left: 0;
+            top: 0.35rem;
+            color: var(--sage);
+        }
+
+        .card-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .card {
+            background: rgba(244, 241, 236, 0.75);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.1rem;
+            border: 1px solid rgba(76, 122, 137, 0.12);
+        }
+
+        .card strong {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+            color: var(--spruce);
+        }
+
+        .info-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(122, 164, 154, 0.15);
+            color: var(--lake);
+            border-radius: 999px;
+            padding: 0.45rem 0.85rem;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        .quick-list {
+            display: grid;
+            gap: 0.65rem;
+            margin-top: 1rem;
+        }
+
+        .quick-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .quick-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(76, 122, 137, 0.12);
+            display: grid;
+            place-items: center;
+            font-size: 1.2rem;
+        }
+
+        .quick-content {
+            flex: 1;
+        }
+
+        details {
+            background: rgba(244, 241, 236, 0.65);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.2rem;
+            border: 1px solid rgba(76, 122, 137, 0.12);
+        }
+
+        summary {
             cursor: pointer;
-            color: #666;
+            font-weight: 600;
+            color: var(--spruce);
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        summary::marker {
+            color: var(--accent);
         }
 
-        .slide-container.active .slide h1,
-        .slide-container.active .slide h2,
-        .slide-container.active .slide p,
-        .slide-container.active .slide ul {
-            animation: fadeInUp 0.8s ease forwards;
+        footer {
+            background: var(--spruce);
+            color: rgba(255, 255, 255, 0.82);
+            padding: 2.5rem 1.5rem 3rem;
+            text-align: center;
         }
 
-        .slide-container.active .slide h2 {
-            animation-delay: 0.2s;
+        .footer-inner {
+            max-width: 640px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1.5rem;
         }
 
-        .slide-container.active .slide p {
-            animation-delay: 0.4s;
+        .footer-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
-        /* Mobile Styles - Only apply on small screens */
-        @media only screen and (max-width: 768px) {
-            .slide {
-                padding: 30px 20px;
-                max-width: 95vw;
-                max-height: 85vh;
-                border-radius: 15px;
-            }
-
-            h1 {
-                font-size: 2rem;
-                margin-bottom: 20px;
-                line-height: 1.1;
-            }
-
-            h2 {
-                font-size: 1.8rem;
-                margin-bottom: 20px;
-            }
-
-            h3 {
-                font-size: 1.4rem;
-                margin-bottom: 15px;
-            }
-
-            p {
-                font-size: 1.1rem;
-                line-height: 1.5;
-                margin-bottom: 15px;
-            }
-
-            ul {
-                font-size: 1rem;
-                margin: 15px 0;
-            }
-
-            li {
-                margin: 10px 0;
-                padding-left: 5px;
-            }
-
-            .quote {
-                font-size: 1.1rem;
-                margin: 20px 0;
-                padding: 15px;
-            }
-
-            .metaphor-box {
-                padding: 20px;
-                margin: 20px 0;
-            }
-
-            .framework-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-                margin: 20px 0;
-            }
-
-            .framework-card {
-                padding: 20px;
-            }
-
-            .framework-card h3 {
-                font-size: 1.3rem;
-            }
-
-            .framework-card p {
-                font-size: 1rem;
-            }
-
-            .story-section {
-                padding: 20px;
-                margin: 20px 0;
-            }
-
-            .emoji {
-                font-size: 1.5rem;
-                margin: 0 5px;
-            }
-
-            .slide-counter {
-                top: 15px;
-                right: 15px;
-                padding: 8px 15px;
-                font-size: 14px;
-            }
-
-            .url-display {
-                top: 15px;
-                left: 15px;
-                padding: 8px 15px;
-                font-size: 12px;
-            }
-
-            /* Hide navigation buttons on mobile */
-            .navigation {
-                display: none;
-            }
-
-            /* Also hide references button on mobile and move it to top */
-            .references-btn {
-                bottom: auto;
-                top: 60px;
-                right: 15px;
-                padding: 8px 12px;
-                font-size: 10px;
-                border-radius: 12px;
-            }
-
-            .references-content {
-                padding: 25px 20px;
-                max-width: 90vw;
-                max-height: 80vh;
-                border-radius: 10px;
-            }
-
-            .references-content h3 {
-                font-size: 1.3rem;
-                margin-bottom: 15px;
-            }
-
-            .references-content .reference {
+        .footer-actions a {
+            display: inline-flex;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.7rem 1.2rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: rgba(255, 255, 255, 0.9);
                 font-size: 0.9rem;
-                margin-bottom: 12px;
-                line-height: 1.4;
-            }
+        }
 
-            .close-btn {
-                top: 10px;
-                right: 15px;
-                font-size: 20px;
+        @media (min-width: 720px) {
+            .card-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
+        }
 
-            /* Adjust specific slide content for mobile */
-            .slide[style*="font-size: 1.5rem"] {
-                font-size: 1.2rem !important;
-            }
-
-            .highlight {
-                font-size: 1.2rem !important;
-            }
-
-            /* Make success metrics grid 2 columns on mobile */
-            .framework-grid[style*="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"] {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-
-            .framework-card[style*="padding: 20px"] {
-                padding: 15px;
-            }
-
-            .framework-card h3[style*="font-size: 1.4rem"] {
-                font-size: 1.1rem !important;
-            }
-
-            .framework-card p[style*="font-size: 1rem"] {
-                font-size: 0.9rem !important;
+        @media (min-width: 960px) {
+            header {
+                border-bottom-left-radius: 42px;
+                border-bottom-right-radius: 42px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="url-display">
-        https://robertjoellewis.github.io/
+    <header>
+        <div class="header-inner">
+            <div class="brand-mark">
+                <span class="brand-icon">⌂</span>
+                StoryCabin Canyon Retreat
     </div>
-
-    <div class="slide-counter">
-        <span id="current-slide">1</span> / <span id="total-slides">14</span>
-    </div>
-
-    <!-- Slide 1: Title -->
-    <div class="slide-container active">
-        <div class="slide">
-            <h1>Entertainment Science</h1>
-            <h2 class="highlight">Bridging the Ivory Tower & Silver Screen</h2>
-            <p style="font-size: 1.5rem; margin-top: 40px;">Why studios need social scientists and<br>why academics need a new lens on entertainment</p>
-            <div style="margin-top: 50px;">
-                <span class="emoji">🎬</span>
-                <span class="emoji">🔬</span>
-                <span class="emoji">🌉</span>
+            <h1>Your Guest Guide</h1>
+            <p class="tagline">Your Hill Country getaway.</p>
+            <div class="cta-row">
+                <a class="cta primary" href="tel:15125909903">📞 Text or Call Robert</a>
+            <a class="cta" href="sms:15125909903?body=Hi%20Robert%2C%20we%27re%20heading%20to%20StoryCabin%20Canyon%20Retreat!">💬 Quick Message</a>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Slide 2: The Problem -->
-    <div class="slide-container">
-        <div class="slide">
-            <h2>The Gap</h2>
-            <p>Two groups who should be shaping entertainment's future are working with outdated tools:</p>
-            <div class="framework-grid">
-                <div class="framework-card">
-                    <h3>🎭 Practitioners</h3>
-                    <p>Executives want data but lack psychological vocabulary</p>
-                    <p>Screenwriting lore ≠ audience psychology</p>
+    <nav>
+        <div class="nav-inner">
+            <a class="nav-link" href="#welcome">🏠 Welcome</a>
+            <a class="nav-link" href="#arrival">🔑 Arrival</a>
+            <a class="nav-link" href="#comforts">🛋️ House Comforts</a>
+            <a class="nav-link" href="#guidelines">📋 Guidelines</a>
+            <a class="nav-link" href="#local">🗺️ Explore</a>
+            <a class="nav-link" href="#safety">🚨 Safety</a>
+            <a class="nav-link" href="#checkout">🚪 Checkout</a>
+            <a class="nav-link" href="#contact">📱 Contact</a>
+    </div>
+    </nav>
+
+    <main>
+        <div class="content">
+            <section id="welcome">
+                <h2>Welcome to StoryCabin Canyon Retreat</h2>
+                <p>Our white, light-filled cabin on Canyon Lake’s quiet north side was designed for unhurried mornings, easy evenings, and a relaxed flow the moment you arrive. Slip off your shoes, pour a cup, and let Hill Country pace take over.</p>
+                <div class="card-grid" style="margin-top: 1.2rem;">
+                    <div class="card">
+                        <strong>Neighbors in the Know</strong>
+                        <p>Chase (in the RV) and Amy (in the home next door) share our stretch of the ridge. They’re aware of your stay and value the same calm rhythm we do.</p>
+                    </div>
+                    <div class="card">
+                        <strong>Pet-Friendly Touch</strong>
+                        <p>A Turkish throw beside the leather sofa is reserved for four-legged friends. Make yourself at home and treat the furnishings with care.</p>
+                    </div>
                 </div>
-                <div class="framework-card">
-                    <h3>🔬 Scientists</h3>
-                    <p>Rigorous methods but fragmented theories</p>
-                    <p>A "littered landscape" of disconnected ideas</p>
+            </section>
+
+            <section id="arrival">
+                <h2>Arrival & Access</h2>
+                <div class="info-pill">Check-in time follows your booking platform</div>
+                <p>As you travel, watch for a message with the smart-lock pin—sent via the site where you booked. Need a touch more time on departure day? Send a text ahead of schedule and I’ll accommodate when possible.</p>
+                <div class="quick-list">
+                    <div class="quick-item">
+                        <div class="quick-icon">📶</div>
+                        <div class="quick-content">
+                            <strong>Wi-Fi</strong>
+                            <div>Network: <code>stories</code> &nbsp;|&nbsp; Password: <code>3605Steck</code></div>
                 </div>
             </div>
-            <p class="highlight" style="font-size: 1.4rem; margin-top: 30px;">That gap is where the most interesting possibilities live</p>
+                    <div class="quick-item">
+                        <div class="quick-icon">✨</div>
+                        <div class="quick-content">
+                            <strong>Backyard Glow</strong>
+                            <div>The backyard string-light remote rests in the purple Crown Royal bag by the back door. Please dim the glow by midnight to keep our dark-sky profile.</div>
         </div>
     </div>
-
-    <!-- Slide 3: Mendel Metaphor -->
-    <div class="slide-container">
-        <div class="slide">
-            <h2>The Mendel Metaphor</h2>
-            <div class="metaphor-box">
-                <h3>🌱 Gregor Mendel (1860s)</h3>
-                <p>Quietly breeding pea plants in a monastery, discovering the laws of inheritance. Rigorous, systematic, ignored for decades.</p>
-                <p><strong>Then:</strong> Three botanists rediscovered his work. Combined with new microscopy. Revolution in genetics.</p>
-                <p><strong>Result:</strong> Norman Borlaug saved over a billion lives using Mendel's "laws"</p>
+                    <div class="quick-item">
+                        <div class="quick-icon">🔥</div>
+                        <div class="quick-content">
+                            <strong>Fire Ring</strong>
+                            <div>Gather around the fire ring when Comal County is burn-ban free—confirm status at <a href="https://www.co.comal.tx.us/Fire_Marshal.htm" target="_blank" rel="noopener">co.comal.tx.us/Fire_Marshal.htm</a>.</div>
             </div>
-            <p class="highlight">Entertainment science today = Mendel's pea plants</p>
-            <p>Academic rigor + new understandings + data analytics + industry needs = Revolution waiting to happen</p>
         </div>
     </div>
+            </section>
 
-    <!-- Slide 4: Studio Reality -->
-    <div class="slide-container">
-        <div class="slide">
-            <h2>Studio Executives' Questions</h2>
-            <div class="story-section">
+            <section id="comforts">
+                <h2>House Comforts & How-To</h2>
+                <h3>Kitchen & Coffee</h3>
                 <ul>
-                    <li>Who (demographically) will watch this?</li>
-                    <li>How can we get more young people to watch this?</li>
-                    <li>Is this character likable? Memorable?</li>
-                    <li>Is there enough catharsis?</li>
-                    <li>Does the cliffhanger work?</li>
-                    <li>What genre is it?</li>
-                    <li>How is the pacing?</li>
-                    <li>Will this story be successful?</li>
+                    <li>The coffee bar is yours—choose between the Mr. Coffee drip setup, the pour-over kit, or the electric kettle for tea.</li>
+                    <li>Cards and poker chips live in the kitchen pantry for impromptu game nights.</li>
+                    <li>The kitchen pantry has a neighborly spice shelf and core ingredients—borrow what you need and leave the space as you found it.</li>
                 </ul>
-            </div>
-            <p><strong>The problem:</strong> These questions contain hidden psychological assumptions that require expertise in measurement, statistics, and multiple psychological frameworks</p>
-            <div class="quote">
-                "Data scientists aren't trained in psychometrics or psychological theory"
-            </div>
-        </div>
-    </div>
 
-    <!-- Slide 5: What if framework existed -->
-    <div class="slide-container">
-        <div class="slide">
-            <h2>What If A Coherent Framework Existed?</h2>
-            <p>Imagine understanding entertainment through:</p>
-            <div class="framework-grid">
-                <div class="framework-card">
-                    <h3>🧠 Predictive Mind</h3>
-                    <p>How brains minimize surprise</p>
-                </div>
-                <div class="framework-card">
-                    <h3>🏛️ Cognitive Anthropology</h3>
-                    <p>Universal mental mechanisms</p>
-                </div>
-                <div class="framework-card">
-                    <h3>🎯 Entertainment Psychology</h3>
-                    <p>Theories backed by decades of measurement and causal analysis</p>
-                </div>
-                <div class="framework-card">
-                    <h3>📊 Statistical & Causal Tools</h3>
-                    <p>Valid metrics and data analysis geared toward storyteller goals</p>
-                </div>
-            </div>
-            <p class="highlight" style="margin-top: 30px;">Whoever understands the audience's mind best will win</p>
-        </div>
-    </div>
-
-    <!-- Slide 6: Rosetta Stone -->
-    <div class="slide-container">
-        <div class="slide">
-            <h2>A Rosetta Stone for Entertainment</h2>
-            <div class="story-section">
+                <h3>Linens & Laundry</h3>
                 <ul>
-                    <li><strong>Industry intuition</strong> → Measurable psychological phenomena</li>
-                    <li><strong>Screenwriting lore</strong> → Scientific frameworks</li>
-                    <li><strong>Gut feelings</strong> → Quantifiable metrics</li>
+                    <li>Extra sheets and towels are in the downstairs utility closet.</li>
+                    <li>Most spare bedding is stored in the upstairs bunk-room closet—mix and match to suit your group.</li>
+                    <li>The main bedroom bath stays stocked with fresh towels.</li>
                 </ul>
-            </div>
-            <div class="quote">
-                "Issues like pacing, character appeal, suspense—often cited by critics—are connected to quantifiable psychological phenomena researchers have thoroughly dissected"
-            </div>
-        </div>
-    </div>
 
-    <!-- Slide 7: Definition Challenge -->
-    <div class="slide-container">
-        <div class="slide">
-            <h2>What Is Entertainment, Really?</h2>
-            <div class="framework-grid">
-                <div class="framework-card">
-                    <h3>❌ Traditional View</h3>
-                    <p>Zillmann: "Activity designed to delight and... enlighten through the exhibition of the fortunes or misfortunes of others..."</p>
-                    <p>Vorderer: Cognitive "play"</p>
-                </div>
-                <div class="framework-card">
-                    <h3>✅ New Definition</h3>
-                    <p>Entertainment as <strong>technology</strong> for capturing attention</p>
-                    <p>Serves storyteller's goals, not just audience pleasure</p>
-                </div>
-            </div>
-            <p class="highlight">Entertainment exists in the first place because it benefits the storyteller's goals</p>
-        </div>
-    </div>
-
-    <!-- Slide 8: Automobile Metaphor -->
-    <div class="slide-container">
-        <div class="slide">
-            <h2>The Automobile Metaphor</h2>
-            <div class="metaphor-box">
-                <p>Cars aren't designed purely for passenger comfort—they serve manufacturer goals</p>
+                <h3>Movement & Wellness</h3>
                 <ul>
-                    <li><strong>Ad-supported cars:</strong> Maximize time in vehicle</li>
-                    <li><strong>Subscription cars:</strong> Maximize fleet turnover</li>
-                    <li><strong>Planned obsolescence:</strong> Ensure repeat purchases</li>
+                    <li>A Reebok bench, free weights, and a yoga mat live in the bunk-room—roll them out for a quick stretch or workout.</li>
                 </ul>
-            </div>
-            <p>Similarly:</p>
-            <ul>
-                <li><strong>Theatrical films:</strong> Pack in thrills, happy endings</li>
-                <li><strong>Streaming series:</strong> Cliffhangers, binge-worthiness</li>
-                <li><strong>Branded content:</strong> Nudge toward purchase</li>
+
+                <details>
+                    <summary>GE Profile All-in-One Washer & Dryer Tips</summary>
+                    <div style="margin-top: 0.8rem;">
+                        <p>This machine washes and dries in a single run—no mid-cycle transfers needed.</p>
+                        <ul>
+                            <li>Watch the 4-minute overview: <a href="https://www.youtube.com/watch?v=Vw1xQ2BVJr8" target="_blank" rel="noopener">GE Profile combo quick start</a>.</li>
+                            <li>Important: open the lint filter (upper left) and clear both sides after every cycle.</li>
+                        </ul>
+                </div>
+                </details>
+            </section>
+
+            <section id="guidelines">
+                <h2>House Guidelines</h2>
+                <h3>Recycling & Trash</h3>
+                <ul>
+                    <li>Place recyclables in the large outdoor can or the blue pantry container—choose what’s easiest.</li>
+                    <li>Extra trash bags can rest on the back stoop at checkout. If you only fill the existing bins, leave them where they are.</li>
+                </ul>
+
+                <h3>Home Rhythm</h3>
+                <ul>
+                    <li>The thermostat at the top of the stairs is yours to adjust; please set it back to <strong>72°</strong> when you depart.</li>
+                    <li>Stream freely and sign out of personal apps before checkout.</li>
+                    <li>Use the Turkish blanket for pets and keep the white bedding paw-free.</li>
             </ul>
-        </div>
-    </div>
+            </section>
 
-    <!-- Slide 9: Superstimuli -->
-    <div class="slide-container">
-        <div class="slide">
-            <h2>Entertainment & Superstimuli</h2>
-            <p>Entertainment exploits evolved mental mechanisms:</p>
-            <div class="framework-grid">
-                <div class="framework-card">
-                    <h3>🦁 Predator Detection</h3>
-                    <p>Monsters, chase scenes</p>
+            <section id="local">
+                <h2>Explore the Neighborhood</h2>
+                <div class="card-grid">
+                    <div class="card">
+                        <strong>Hill Country Triangle</strong>
+                        <p>Blanco, Gruene, and Wimberley are each a 20-minute scenic drive—ideal for antiques, live music, and relaxed dining.</p>
+                        <p>Favorite swims: Blanco River at Blanco State Park, Landa Springs in New Braunfels, and Cypress Creek Falls in Wimberley.</p>
                 </div>
-                <div class="framework-card">
-                    <h3>💕 Mate Selection</h3>
-                    <p>Attractive characters, romance</p>
+                    <div class="card">
+                        <strong>Local Bite</strong>
+                        <p><a href="https://www.wildflourtx.com/" target="_blank" rel="noopener">WildFlour</a> is minutes away—seasonal plates, approachable pricing, relaxed ambiance.</p>
                 </div>
-                <div class="framework-card">
-                    <h3>🤝 Social Dynamics</h3>
-                    <p>Betrayal, cooperation, status</p>
+                    <div class="card">
+                        <strong>Groceries & Essentials</strong>
+                        <p><a href="https://brookshirebrothers.com/" target="_blank" rel="noopener">Brookshire Brothers</a> sits right around the corner—ideal for basics, last-minute staples, and prepared bites (selection is tighter and pricing a touch higher than H-E-B).</p>
+                        <p>For a fuller cart, the nearest H-E-B in New Braunfels is a straightforward drive.</p>
                 </div>
-                <div class="framework-card">
-                    <h3>⚡ Competence Display</h3>
-                    <p>Skills, heroism, mastery</p>
+                    <div class="card">
+                        <strong>Neighborhood Trail</strong>
+                        <p>A one-mile neighborhood stroll lands you at a peaceful trailhead: <a href="https://maps.app.goo.gl/54skppYSoh22vUjcA" target="_blank" rel="noopener">Open the map</a>.</p>
                 </div>
-                <div class="framework-card">
-                    <h3>🦠 Pathogen Avoidance</h3>
-                    <p>Parasites, skin disease, deformity</p>
+                    <div class="card">
+                        <strong>Water & Sky</strong>
+                        <p>When Overlook Park is open, stroll across the Canyon Lake Dam at sunset—romantic and breezy. Gates sometimes close; a quick “Overlook Park Canyon Lake” search gives the latest.</p>
+                        <p>For a cool-down, head to the Guadalupe River trail below the dam and dip your toes in the release water.</p>
                 </div>
-                <div class="framework-card">
-                    <h3>🌪️ Intuitive Physics</h3>
-                    <p>Flying, teleportation, Rube Goldberg</p>
                 </div>
-                <div class="framework-card">
-                    <h3>🏔️ Landscape Evaluation</h3>
-                    <p>Resource and threat potential</p>
-                </div>
-                <div class="framework-card">
-                    <h3>🍖 Food Detection</h3>
-                    <p>Feasting, delicacies, abundance</p>
-                </div>
-                <div class="framework-card">
-                    <h3>👶 Cuteness</h3>
-                    <p>Babies, parental protection</p>
-                </div>
-            </div>
-            <p class="highlight">75 evolved mechanisms that entertainment hacks into (Dubourg et al.)</p>
-        </div>
-    </div>
+            </section>
 
-    <!-- Slide 10: Character Likability -->
-    <div class="slide-container">
-        <div class="slide">
-            <h2>Character Likability Science</h2>
-            <div class="story-section">
-                <p><strong>The Industry Question:</strong> "Is this character likable?"</p>
-                <p><strong>The Science:</strong> Audiences evaluate characters primarily through morality</p>
-            </div>
-            <div class="framework-grid">
-                <div class="framework-card">
-                    <h3>🎯 Moral Intuitions</h3>
-                    <p>Courage, tradition, family, care, fairness, ingroup, purity</p>
-                </div>
-                <div class="framework-card">
-                    <h3>🧠 Person Perception</h3>
-                    <p>Competence, warmth, moral character</p>
-                </div>
-                <div class="framework-card">
-                    <h3>📊 Disposition Theory</h3>
-                    <p>Measurable audience-character relationships</p>
-                </div>
-                <div class="framework-card">
-                    <h3>⚡ Excitation Transfer Theory</h3>
-                    <p>Character-centric structural explanation for suspense</p>
-                </div>
-            </div>
-        </div>
-    </div>
+            <section id="safety">
+                <h2>Safety & Essentials</h2>
+                <ul>
+                    <li>Emergency? Dial <strong>911</strong>. The closest emergency room is in New Braunfels.</li>
+                    <li>Verify burn-ban status before striking the fire ring: <a href="https://www.co.comal.tx.us/Fire_Marshal.htm" target="_blank" rel="noopener">Comal County Fire Marshal</a>.</li>
+                    <li>First-aid kit is in the downstairs bathroom cabinet; kitchen upper cabinets hold everyday remedies.</li>
+                    <li>If you move any outdoor pieces, place them back before checkout to keep pathways clear.</li>
+                </ul>
+            </section>
 
-    <!-- Slide 11: Suspense Science -->
-    <div class="slide-container">
-        <div class="slide">
-            <h2>The True Nature of Suspense</h2>
-            <div class="story-section">
-                <h3>🎭 The Hiding from Nazis Example</h3>
-                <p>Audience ≠ Character</p>
-                <p>We don't "identify" with characters—we judge them</p>
-            </div>
-            <div class="framework-grid">
-                <div class="framework-card">
-                    <h3>❌ Old Theory</h3>
-                    <p>Excitation transfer</p>
-                    <p>Paradox of suspense</p>
-                </div>
-                <div class="framework-card">
-                    <h3>✅ New Understanding</h3>
-                    <p>Predictive mind theory</p>
-                    <p>"Honest placebo" effect</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Slide 12: Success Metrics -->
-    <div class="slide-container">
-        <div class="slide">
-            <h2>Defining Success</h2>
-            <p>What are you optimizing for?</p>
-            <div class="framework-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                <div class="framework-card" style="padding: 20px;">
-                    <h3 style="font-size: 1.4rem;">💰 Commercial</h3>
-                    <p style="font-size: 1rem;">Box office, subscribers, retention</p>
-                </div>
-                <div class="framework-card" style="padding: 20px;">
-                    <h3 style="font-size: 1.4rem;">🏆 Critical</h3>
-                    <p style="font-size: 1rem;">Awards, acclaim, prestige</p>
-                </div>
-                <div class="framework-card" style="padding: 20px;">
-                    <h3 style="font-size: 1.4rem;">📊 Engagement</h3>
-                    <p style="font-size: 1rem;">Time spent, completion rates</p>
-                </div>
-                <div class="framework-card" style="padding: 20px;">
-                    <h3 style="font-size: 1.4rem;">🎯 Strategic</h3>
-                    <p style="font-size: 1rem;">Brand awareness, franchise potential</p>
-                </div>
-                <div class="framework-card" style="padding: 20px;">
-                    <h3 style="font-size: 1.4rem;">✊ Activism</h3>
-                    <p style="font-size: 1rem;">Social change, awareness, mobilization</p>
-                </div>
-            </div>
-            <div class="quote">
-                "Entertainment psychology distinguishes enjoyment vs. appreciation—with measurable, brain-scan validated differences"
-            </div>
-        </div>
-    </div>
-
-    <!-- Slide 13: Call to Action -->
-    <div class="slide-container">
-        <div class="slide">
-            <h2>The Bridge We Must Build</h2>
-            <div class="metaphor-box">
-                <h3>🌉 For Industry:</h3>
-                <p>Upgrade vocabulary, ask better questions, make data meaningful</p>
-                <h3>🔬 For Academia:</h3>
-                <p>Do research that impacts industry, create unified framework to generate innovation</p>
-            </div>
-            <p>This isn't just about maximizing ROI—it's about:</p>
-            <ul>
-                <li>Creating more compelling stories with precision</li>
-                <li>Understanding what grabs and holds attention</li>
-                <li>Using that attention for any goal: entertainment, activism, education</li>
+            <section id="checkout">
+                <h2>Checkout Checklist</h2>
+                <ul>
+                    <li>Thermostat back to <strong>72°</strong>.</li>
+                    <li>Backyard string lights off, remote returned to the Crown Royal bag.</li>
+                    <li>Trash bags to the back stoop only if you’ve created extras; otherwise, leave the bins where they are.</li>
+                    <li>Log out of any streaming apps you used.</li>
+                    <li>Give the kitchen and living areas a quick tidy so the next story can start fresh.</li>
+                    <li>If you ran the washer/dryer, give the lint filter one last check.</li>
             </ul>
-            <div class="quote">
-                "Like Mendel's genetics eventually saved billions of lives, entertainment science could reshape how stories are made"
+            </section>
+
+            <section id="contact">
+                <h2>Need Anything?</h2>
+                <p>Reach out anytime. I live close enough to help and want your cabin story to be an easy one.</p>
+                <p class="info-pill">📱 Robert • <a href="tel:15125909903" style="color: inherit;">512&nbsp;590&nbsp;9903</a></p>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-inner">
+            <p>Thank you for choosing StoryCabin Canyon Retreat. May the stories you write here be the ones you remember most.</p>
+            <div class="footer-actions">
+                <a href="#arrival">Arrival Info</a>
+                <a href="https://maps.app.goo.gl/54skppYSoh22vUjcA" target="_blank" rel="noopener">Trail Map</a>
+                <a href="https://www.co.comal.tx.us/Fire_Marshal.htm" target="_blank" rel="noopener">Burn Ban Status</a>
             </div>
         </div>
-    </div>
-
-    <!-- Slide 14: Conclusion -->
-    <div class="slide-container">
-        <div class="slide">
-            <h1>Entertainment Science</h1>
-            <h2 class="highlight">The Future is Scientific Storytelling</h2>
-            <div class="framework-grid">
-                <div class="framework-card">
-                    <h3>🎯 Studios</h3>
-                    <p>Look to entertainment scholars</p>
-                    <p>Psychology > Screenwriting lore</p>
-                </div>
-                <div class="framework-card">
-                    <h3>🔬 Academics</h3>
-                    <p>Entertainment as attention technology</p>
-                    <p>Industry-impacting research</p>
-                </div>
-            </div>
-            <p style="font-size: 1.5rem; margin-top: 40px;">Questions?</p>
-            <div style="margin-top: 30px;">
-                <span class="emoji">🎬</span>
-                <span class="emoji">🤝</span>
-                <span class="emoji">🔬</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="navigation">
-        <button class="nav-btn" onclick="previousSlide()">← Previous</button>
-        <button class="nav-btn" onclick="nextSlide()">Next →</button>
-    </div>
-
-    <button class="references-btn" id="referencesBtn" onclick="showReferences()">Refs</button>
-
-    <div class="references-modal" id="referencesModal" onclick="hideReferences()">
-        <div class="references-content" onclick="event.stopPropagation()">
-            <button class="close-btn" onclick="hideReferences()">×</button>
-            <h3>References</h3>
-            <div id="referencesText"></div>
-        </div>
-    </div>
-
-    <script>
-        let currentSlide = 0;
-        const slideContainers = document.querySelectorAll('.slide-container');
-        const totalSlides = slideContainers.length;
-        
-        document.getElementById('total-slides').textContent = totalSlides;
-
-        // References data for each slide (0-indexed)
-        const slideReferences = {
-            1: [
-                'Field, S. (1982). <em>Screenplay</em> (p. 10). New York: Delacorte.',
-                'McKee, R. (1997). Story: Substance, structure, style, and the principles of screenwriting. <em>Alba Editorial</em>.',
-                'Snyder, B. (2023). <em>SAVE THE CAT!®</em>. Noura Books.',
-                'Tamborini, R. (2024). Media <em>Entertainment Theory and Research: Still an amorphous area</em> In N.D. Bowman (Ed.) <em>Entertainment Media and Communication</em> (Vol. 20). Walter de Gruyter GmbH & Co KG.',
-                'Tannenbaum, P. H. (2014). An unstructured introduction to an amorphous area. In <em>The entertainment functions of television</em> (pp. 1-12). Psychology Press.'
-            ],
-            2: [
-                'National Human Genome Research Institute. (n.d.). 1900: Rediscovery of Mendel\'s work. Online Education Kit. https://www.genome.gov/25520238/online-education-kit-1900-rediscovery-of-mendels-work',
-                'Syngenta. (n.d.). The gardener monk\'s genetic revolution: From Mendel\'s pea plants to the breakthroughs of CRISPR. <em>Syngenta</em>. https://www.syngenta.com/agriculture/agricultural-technology/gardener-monks-genetic-revolution'
-            ],
-            4: [
-                'Andersen, M. M., Kiverstein, J., Miller, M., & Roepstorff, A. (2023). Play in predictive minds: A cognitive theory of play. <em>Psychological Review</em>, <em>130</em>(2), 462.',
-                'Bowman, N. D. (Ed.). (2024). <em>Entertainment Media and Communication</em> (Vol. 20). Walter de Gruyter GmbH & Co KG.',
-                'Clark, A. (2024). <em>The experience machine: How our minds predict and shape reality</em>. Random House.',
-                'Dubourg, E., & Baumard, N. (2022). Why and how did narrative fictions evolve? Fictions as entertainment technologies. <em>Frontiers in Psychology</em>, <em>13</em>, 786770.',
-                'Friston, K. (2010). The free-energy principle: a unified brain theory?. <em>Nature reviews neuroscience</em>, <em>11</em>(2), 127-138.'
-            ],
-            6: [
-                'Zillmann, D., & Bryant, J. (1994). Entertainment as media effect. In D. Zillmann & J. Bryant (Eds.), <em>Media effects: Advances in theory and research</em> (pp. 437–462). Hillsdale, NJ: Lawrence Erlbaum.'
-            ],
-            8: [
-                'Barrett, D. (2015). Supernormal Stimuli in the Media. <em>Internet, film, news, gossip: an evolutionary perspective on the media. Retrieved June</em>, <em>24</em>(2), 130-153.',
-                'Dubourg, E., Thouzeau, V., Beuchot, T., Bonard, C., Boyer, P., Chevallier, C., Clasen, M., Boon-Falleur, M., Fiorio, G., Fitouchi, L., Fisher, M. L., Gantman, A., Grant, A., Hye-Knudsen, M., Katiyar, T., Kjeldgaard-Christiansen, J., Mercier, M., Mercier, H., Morin, O., . . . Baumard, N. (n.d.). <em>Explaining the diversity and variability of fictions: An evolutionary framework</em> [Preprint]. OSF. https://osf.io/preprints/osf/me6bz_v1'
-            ],
-            9: [
-                'Curry, O. S. (2016). Morality as cooperation: A problem-centred approach. <em>The evolution of morality</em>, 27-51.',
-                'Graham, J., Haidt, J., Koleva, S., Motyl, M., Iyer, R., Wojcik, S. P., & Ditto, P. H. (2013). Moral foundations theory: The pragmatic validity of moral pluralism. In <em>Advances in experimental social psychology</em> (Vol. 47, pp. 55-130). Academic Press.',
-                'Raney, A. A. (2004). Expanding disposition theory: Reconsidering character liking, moral evaluations, and enjoyment. <em>Communication theory</em>, <em>14</em>(4), 348-369.',
-                'Wojciszke, B. (2005). Morality and competence in person-and self-perception. <em>European review of social psychology</em>, <em>16</em>(1), 155-188.',
-                'Zillmann, D. (2008). Excitation transfer theory. <em>The international encyclopedia of communication</em>.'
-            ]
-        };
-
-        function showSlide(n) {
-            slideContainers[currentSlide].classList.remove('active');
-            currentSlide = (n + totalSlides) % totalSlides;
-            slideContainers[currentSlide].classList.add('active');
-            document.getElementById('current-slide').textContent = currentSlide + 1;
-            
-            // Show/hide references button based on whether current slide has references
-            const referencesBtn = document.getElementById('referencesBtn');
-            if (slideReferences[currentSlide]) {
-                referencesBtn.classList.add('visible');
-            } else {
-                referencesBtn.classList.remove('visible');
-            }
-        }
-
-        function nextSlide() {
-            showSlide(currentSlide + 1);
-        }
-
-        function previousSlide() {
-            showSlide(currentSlide - 1);
-        }
-
-        function showReferences() {
-            const modal = document.getElementById('referencesModal');
-            const referencesText = document.getElementById('referencesText');
-            const refs = slideReferences[currentSlide];
-            
-            if (refs) {
-                referencesText.innerHTML = refs.map(ref => 
-                    `<div class="reference">${ref}</div>`
-                ).join('');
-                modal.classList.add('active');
-            }
-        }
-
-        function hideReferences() {
-            const modal = document.getElementById('referencesModal');
-            modal.classList.remove('active');
-        }
-
-        // Keyboard navigation
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'ArrowRight' || e.key === ' ') {
-                nextSlide();
-            } else if (e.key === 'ArrowLeft') {
-                previousSlide();
-            } else if (e.key === 'Escape') {
-                hideReferences();
-            }
-        });
-
-        // Touch/Swipe navigation for mobile
-        let touchStartX = 0;
-        let touchEndX = 0;
-        let touchStartY = 0;
-        let touchEndY = 0;
-
-        function handleSwipe() {
-            const swipeThreshold = 50; // Minimum distance for a swipe
-            const horizontalDistance = Math.abs(touchEndX - touchStartX);
-            const verticalDistance = Math.abs(touchEndY - touchStartY);
-            
-            // Only trigger if horizontal swipe is greater than vertical (to avoid interfering with scrolling)
-            if (horizontalDistance > verticalDistance && horizontalDistance > swipeThreshold) {
-                if (touchEndX < touchStartX) {
-                    // Swiped left - go to next slide
-                    nextSlide();
-                } else if (touchEndX > touchStartX) {
-                    // Swiped right - go to previous slide
-                    previousSlide();
-                }
-            }
-        }
-
-        // Add touch event listeners
-        document.addEventListener('touchstart', function(e) {
-            touchStartX = e.changedTouches[0].screenX;
-            touchStartY = e.changedTouches[0].screenY;
-        });
-
-        document.addEventListener('touchend', function(e) {
-            touchEndX = e.changedTouches[0].screenX;
-            touchEndY = e.changedTouches[0].screenY;
-            handleSwipe();
-        });
-
-        // Initialize
-        showSlide(0);
-    </script>
+    </footer>
 </body>
 </html>
+
